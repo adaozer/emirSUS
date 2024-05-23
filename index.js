@@ -2,6 +2,7 @@ const { Client, Collection, GatewayIntentBits, REST, Routes } = require('discord
 const { clientId, guildId, token, channelId } = require('./config.json');
 const fs = require('fs');
 const path = require('path');
+const { map } = require('./map.js');  // Import the map
 
 // Create a new client instance with necessary intents
 const client = new Client({
@@ -39,13 +40,10 @@ for (const folder of commandFolders) {
 
 // Construct and prepare an instance of the REST module
 const rest = new REST({ version: '10' }).setToken(token);
-
-// Deploy commands
 (async () => {
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-        // The put method is used to fully refresh all commands in the guild with the current set
         const data = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             { body: commands },
@@ -58,10 +56,10 @@ const rest = new REST({ version: '10' }).setToken(token);
 })();
 
 // Ready event
-client.once('ready', () => {
+client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     const guild = client.guilds.cache.get(guildId);
-    const botMember = guild.members.cache.get(client.user.id);
+    const botMember = await guild.members.fetch(client.user.id);
     console.log(`Bot permissions: ${botMember.permissions.toArray()}`);
 });
 
@@ -128,6 +126,8 @@ client.on("messageCreate", async (msg) => {
     // Update the cooldown map
     cooldowns.set(emir, userData);
 });
+
+module.exports = { client };
 
 // Login to Discord
 client.login(token);
