@@ -2,7 +2,6 @@ const { Client, Collection, GatewayIntentBits, REST, Routes } = require('discord
 const { clientId, guildId, token, channelId } = require('./config.json');
 const fs = require('fs');
 const path = require('path');
-const { map } = require('./map.js');  // Import the map
 
 // Create a new client instance with necessary intents
 const client = new Client({
@@ -58,9 +57,6 @@ const rest = new REST({ version: '10' }).setToken(token);
 // Ready event
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    const guild = client.guilds.cache.get(guildId);
-    const botMember = await guild.members.fetch(client.user.id);
-    console.log(`Bot permissions: ${botMember.permissions.toArray()}`);
 });
 
 // Command interaction handler
@@ -78,56 +74,6 @@ client.on('interactionCreate', async interaction => {
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
-
-const cooldowns = new Map();
-const emir = "477210142132273152";
-
-client.on("messageCreate", async (msg) => {
-    console.log(`Received a message from ${msg.author.id}`);
-    if (msg.author.bot || msg.author.id !== emir) return;
-
-    console.log(`Processing message from Emir`);
-
-    let time = Date.now();
-    const cooldownAmount = 1000; // 1 second
-    const muteDuration = 15 * 1000; // 15 seconds
-    const messageLimit = 3;
-
-    if (!cooldowns.has(emir)) {
-        cooldowns.set(emir, { messages: [], timeout: null });
-    }
-
-    const userData = cooldowns.get(emir);
-    console.log(`User data before processing: ${JSON.stringify(userData)}`);
-    userData.messages.push(time);
-
-    // Remove messages older than the cooldown amount
-    userData.messages = userData.messages.filter(timestamp => time - timestamp < cooldownAmount);
-    console.log(`Messages within cooldown: ${JSON.stringify(userData.messages)}`);
-
-    if (userData.messages.length > messageLimit) {
-        // User exceeded the limit, mute them
-        try {
-            const user = await msg.guild.members.fetch(emir);
-            console.log(`Fetched user: ${user.user.username}`);
-            await user.timeout(muteDuration, 'EMİR SUUUUUUUUUUS');
-            console.log(`${msg.author.username} has been muted for spamming.`);
-            userData.messages = []; // Reset the message count after muting
-            
-            // Fetch the channel and send a message
-            const channel = await client.channels.fetch(channelId);
-            await channel.send('EMİR KAPA ÇENENİ');
-            console.log('Message sent to the channel.');
-        } catch (error) {
-            console.error('Error muting user:', error);
-        }
-    }
-
-    // Update the cooldown map
-    cooldowns.set(emir, userData);
-});
-
-module.exports = { client };
 
 // Login to Discord
 client.login(token);
