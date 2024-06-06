@@ -4,7 +4,7 @@ const { map, user_map } = require('C:/Users/Ada/Documents/emir_sus/map.js');  //
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('module-remove')
-        .setDescription('Add a module')
+        .setDescription('Remove a module')
         .addStringOption(option => {
             option.setName('module')
                 .setDescription('Select Module')
@@ -20,7 +20,7 @@ module.exports = {
             return option;
         }),
     async execute(interaction) {
-        const user = interaction.user.id;
+        const user = interaction.user.id
         const module = interaction.options.getString('module');
     
         if (!user_map[user]) {

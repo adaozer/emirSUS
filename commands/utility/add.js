@@ -28,7 +28,8 @@ module.exports = {
         }
         if (user_map[user].indexOf(module) >= 0) {
             await interaction.reply("You have already added this module!")
-        } else {
+        } else
+        {
             await user_map[user].push(module);
             await interaction.reply(`Added ${module}`)
             console.log(user_map);
