@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { map, user_map } = require('C:/Users/Ada/Documents/emir_sus/map.js');  // Import the map
 
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('module-remove')
@@ -10,8 +11,16 @@ module.exports = {
                 .setDescription('Select Module')
                 .setRequired(true);
 
+            // Assuming 'map' is defined somewhere above this code block
             if (map && typeof map === 'object') {
-                const choices = Object.keys(map).map(key => ({ name: key, value: key }));
+                // Extract keys from the map where the value is an array
+                const choices = Object.keys(map).map(key => {
+                    const value = map[key];
+                    if (Array.isArray(value)) {
+                        return { name: key, value: key };
+                    }
+                }).filter(choice => choice !== undefined); // Filter out undefined values
+                
                 option.addChoices(...choices);
             } else {
                 console.error('Map is undefined or not an object');
